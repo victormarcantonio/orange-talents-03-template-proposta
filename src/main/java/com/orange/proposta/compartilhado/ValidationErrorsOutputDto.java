@@ -1,6 +1,7 @@
 package com.orange.proposta.compartilhado;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class ValidationErrorsOutputDto {
@@ -23,4 +24,5 @@ public class ValidationErrorsOutputDto {
     public List<FieldErrorOutputDto> getFieldErrors() {
         return fieldErrors;
     }
+
 }

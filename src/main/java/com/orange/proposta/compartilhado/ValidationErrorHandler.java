@@ -3,6 +3,7 @@ package com.orange.proposta.compartilhado;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestControllerAdvice
@@ -36,6 +39,15 @@ public class ValidationErrorHandler {
         List<ObjectError> globalErrors = exception.getBindingResult().getGlobalErrors();
         List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
         return buildValidationErrors(globalErrors, fieldErrors);
+    }
+
+    @ExceptionHandler(ApiErroException.class)
+    public ResponseEntity<ErroPadronizado>handleApiErroException(ApiErroException apiErroException){
+        Collection<String>mensagens = new ArrayList<>();
+        mensagens.add(apiErroException.getReason());
+
+        ErroPadronizado erroPadronizado = new ErroPadronizado(mensagens);
+        return ResponseEntity.status(apiErroException.getHttpStatus()).body(erroPadronizado);
     }
 
     private ValidationErrorsOutputDto buildValidationErrors(List<ObjectError> globalErrors, List<FieldError> fieldErrors){

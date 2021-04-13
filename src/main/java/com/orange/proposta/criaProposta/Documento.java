@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.br.CPF;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
+import javax.validation.constraints.Pattern;
 import java.lang.annotation.*;
 
 @ConstraintComposition(CompositionType.OR)
