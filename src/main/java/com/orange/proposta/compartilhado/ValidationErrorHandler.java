@@ -1,5 +1,6 @@
 package com.orange.proposta.compartilhado;
 
+import feign.FeignException;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,15 @@ public class ValidationErrorHandler {
         List<ObjectError> globalErrors = exception.getBindingResult().getGlobalErrors();
         List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
         return buildValidationErrors(globalErrors, fieldErrors);
+    }
+
+    @ExceptionHandler(FeignErroException.class)
+    public ResponseEntity<ErroPadronizado> handleValidationError(FeignErroException exception){
+        Collection<String>mensagens = new ArrayList<>();
+        mensagens.add(exception.getReason());
+
+        ErroPadronizado erroPadronizado = new ErroPadronizado(mensagens);
+        return ResponseEntity.status(exception.getHttpStatus()).body(erroPadronizado);
     }
 
     @ExceptionHandler(ApiErroException.class)

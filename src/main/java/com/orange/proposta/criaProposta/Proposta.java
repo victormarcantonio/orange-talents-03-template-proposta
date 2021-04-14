@@ -24,7 +24,8 @@ public class Proposta {
     @NotNull
     @Positive
     private BigDecimal salario;
-
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     //Usado apenas pelo Hibernate
     @Deprecated
@@ -38,5 +39,22 @@ public class Proposta {
         this.nome = nome;
         this.endereco = endereco;
         this.salario = salario;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getDocumento() {
+        return documento;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public boolean aceitaProposta(String resultadoSolicitacao) {
+      this.status = resultadoSolicitacao.equals("SEM_RESTRICAO") ? Status.ELEGIVEL : Status.NAO_ELEGIVEL;
+      return this.status.equals(Status.ELEGIVEL);
     }
 }
