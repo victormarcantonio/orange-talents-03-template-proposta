@@ -20,7 +20,9 @@ import java.net.URI;
 @RequestMapping("/propostas")
 public class PropostaController {
 
+    //1
     private PropostaRepository propostaRepository;
+    //2
     private PropostaClient propostaClient;
     private final Logger logger = LoggerFactory.getLogger(AnaliseResponse.class);
 
@@ -29,28 +31,30 @@ public class PropostaController {
         this.propostaClient = propostaClient;
     }
 
+
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody @Valid PropostaRequest request, UriComponentsBuilder uriBuilder) {
+
         Proposta proposta = request.converter();
         boolean existeDocumento = propostaRepository.existsByDocumento(request.getDocumento());
         if(existeDocumento) {
           throw new ApiErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Já existe proposta criada para o cliente de documento "+request.getDocumento());
         }
-        try {
-            AnaliseResponse resultadoAnalise = resultado(proposta);
-            proposta.aceitaProposta(resultadoAnalise.getResultadoSolicitacao());
-            propostaRepository.save(proposta);
+            resultadoAnalise(proposta);
             URI uri = uriBuilder.path("/propostas/{id}").buildAndExpand(request.getId()).toUri();
             return ResponseEntity.created(uri).body(request);
+    }
+
+    public void resultadoAnalise(Proposta proposta){
+        AnaliseRequest analiseRequest = new AnaliseRequest(proposta.getDocumento(), proposta.getNome(), proposta.getId().toString());
+        try {
+            AnaliseResponse analiseResponse = propostaClient.analisaProposta(analiseRequest);
+            proposta.aceitaProposta(analiseResponse.getResultadoSolicitacao());
+            propostaRepository.save(proposta);
         }catch(FeignException e){
+            proposta.aceitaProposta("COM_RESTRICAO");
             propostaRepository.save(proposta);
             throw new FeignErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Proposta não elegível");
         }
-    }
-
-    public AnaliseResponse resultado(Proposta proposta){
-        AnaliseRequest analiseRequest = new AnaliseRequest(proposta.getDocumento(), proposta.getNome(), proposta.getId().toString());
-
-        return propostaClient.analisaProposta(analiseRequest);
     }
 }

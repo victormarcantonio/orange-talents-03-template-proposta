@@ -2,10 +2,8 @@ package com.orange.proposta.criaProposta;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
 
 public class AnaliseRequest {
-
     @NotBlank
     private String documento;
     @NotBlank

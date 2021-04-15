@@ -53,8 +53,7 @@ public class Proposta {
         return nome;
     }
 
-    public boolean aceitaProposta(String resultadoSolicitacao) {
+    public void aceitaProposta(String resultadoSolicitacao) {
       this.status = resultadoSolicitacao.equals("SEM_RESTRICAO") ? Status.ELEGIVEL : Status.NAO_ELEGIVEL;
-      return this.status.equals(Status.ELEGIVEL);
     }
 }
