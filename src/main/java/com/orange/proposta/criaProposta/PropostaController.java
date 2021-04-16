@@ -18,6 +18,7 @@ import java.net.BindException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -49,6 +50,13 @@ public class PropostaController {
             resultadoAnalise(proposta);
             URI uri = uriBuilder.path("/propostas/{id}").buildAndExpand(request.getId()).toUri();
             return ResponseEntity.created(uri).body(request);
+    }
+
+    @GetMapping("/{idProposta}")
+    public ResponseEntity<PropostaResponse> detalheProposta(@PathVariable ("idProposta") UUID idProposta){
+       Optional<Proposta> possivelProposta = propostaRepository.findById(idProposta);
+        return possivelProposta.map(proposta -> ResponseEntity.ok().body(new PropostaResponse(proposta)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     public void resultadoAnalise(Proposta proposta){
