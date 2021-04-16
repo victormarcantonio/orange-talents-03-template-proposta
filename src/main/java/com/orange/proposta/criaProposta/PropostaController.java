@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -15,6 +16,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.BindException;
 import java.net.URI;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/propostas")
@@ -22,15 +26,17 @@ public class PropostaController {
 
     //1
     private PropostaRepository propostaRepository;
+    private CartaoRepository cartaoRepository;
     //2
     private PropostaClient propostaClient;
-    private final Logger logger = LoggerFactory.getLogger(AnaliseResponse.class);
+    private CartaoClient cartaoClient;
 
-    public PropostaController(PropostaRepository propostaRepository, PropostaClient propostaClient) {
+    public PropostaController(PropostaRepository propostaRepository, CartaoRepository cartaoRepository, PropostaClient propostaClient, CartaoClient cartaoClient) {
         this.propostaRepository = propostaRepository;
+        this.cartaoRepository = cartaoRepository;
         this.propostaClient = propostaClient;
+        this.cartaoClient = cartaoClient;
     }
-
 
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody @Valid PropostaRequest request, UriComponentsBuilder uriBuilder) {
@@ -55,6 +61,25 @@ public class PropostaController {
             proposta.aceitaProposta("COM_RESTRICAO");
             propostaRepository.save(proposta);
             throw new FeignErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Proposta não elegível");
+        }
+    }
+
+   @Scheduled(fixedDelay = 5000)
+    public void verificaSeCartaoFoiGerado(){
+       List<Proposta> propostas  = propostaRepository.findByCartaoIsNullAndStatusIs(Status.ELEGIVEL);
+       propostas.forEach(this::associaCartao);
+    }
+
+
+    public void associaCartao(Proposta proposta) {
+        try {
+            Optional<CartaoResponse> cartaoResponse = cartaoClient.retornaCartao(proposta.getId().toString());
+            if (cartaoResponse.isPresent()) {
+                Cartao cartao = proposta.criaCartao(cartaoResponse.get());
+                cartaoRepository.save(cartao);
+            }
+        } catch (FeignException e) {
+            throw new FeignErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Cartão não gerado, aguardar próximo processamento");
         }
     }
 }

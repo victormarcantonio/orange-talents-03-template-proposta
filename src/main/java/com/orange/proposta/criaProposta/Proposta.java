@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -26,6 +27,8 @@ public class Proposta {
     private BigDecimal salario;
     @Enumerated(EnumType.STRING)
     private Status status;
+    @OneToOne(mappedBy = "proposta")
+    private Cartao cartao;
 
     //Usado apenas pelo Hibernate
     @Deprecated
@@ -55,5 +58,9 @@ public class Proposta {
 
     public void aceitaProposta(String resultadoSolicitacao) {
       this.status = resultadoSolicitacao.equals("SEM_RESTRICAO") ? Status.ELEGIVEL : Status.NAO_ELEGIVEL;
+    }
+
+    public Cartao criaCartao(CartaoResponse cartaoResponse) {
+       return new Cartao(Long.parseLong(cartaoResponse.getId().replace("-", "")), LocalDateTime.parse(cartaoResponse.getEmitidoEm()), this);
     }
 }
