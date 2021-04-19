@@ -9,7 +9,7 @@ import java.util.UUID;
 @Entity
 public class Cartao {
     @Id
-    private Long numero;
+    private Long id;
     private LocalDateTime emissao;
     @OneToOne
     private Proposta proposta;
@@ -19,8 +19,8 @@ public class Cartao {
     public Cartao() {
     }
 
-    public Cartao(Long numero, LocalDateTime emissao, Proposta proposta) {
-        this.numero = numero;
+    public Cartao(Long id, LocalDateTime emissao, Proposta proposta) {
+        this.id = id;
         this.emissao = emissao;
         this.proposta = proposta;
     }

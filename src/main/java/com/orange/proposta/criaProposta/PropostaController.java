@@ -3,6 +3,7 @@ package com.orange.proposta.criaProposta;
 import com.orange.proposta.compartilhado.ApiErroException;
 import com.orange.proposta.compartilhado.FeignErroException;
 import feign.FeignException;
+import net.bytebuddy.asm.Advice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -28,13 +29,15 @@ public class PropostaController {
     //1
     private PropostaRepository propostaRepository;
     private CartaoRepository cartaoRepository;
+    private BiometriaRepository biometriaRepository;
     //2
     private PropostaClient propostaClient;
     private CartaoClient cartaoClient;
 
-    public PropostaController(PropostaRepository propostaRepository, CartaoRepository cartaoRepository, PropostaClient propostaClient, CartaoClient cartaoClient) {
+    public PropostaController(PropostaRepository propostaRepository, CartaoRepository cartaoRepository, BiometriaRepository biometriaRepository, PropostaClient propostaClient, CartaoClient cartaoClient) {
         this.propostaRepository = propostaRepository;
         this.cartaoRepository = cartaoRepository;
+        this.biometriaRepository = biometriaRepository;
         this.propostaClient = propostaClient;
         this.cartaoClient = cartaoClient;
     }
@@ -89,5 +92,17 @@ public class PropostaController {
         } catch (FeignException e) {
             throw new FeignErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Cartão não gerado, aguardar próximo processamento");
         }
+    }
+
+    @PostMapping("/biometria/{idCartao}")
+    public ResponseEntity<?>cadastrarBiometria(@PathVariable ("idCartao") Long idCartao, @RequestBody BiometriaRequest request, UriComponentsBuilder uriBuilder){
+        Optional<Cartao> cartao = cartaoRepository.findById(idCartao);
+        if(cartao.isPresent()){
+          Biometria biometria = request.converter(cartao.get());
+          biometriaRepository.save(biometria);
+          URI uri = uriBuilder.path("/propostas/biometria/{id}").buildAndExpand(request.getId()).toUri();
+          return ResponseEntity.created(uri).build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }
