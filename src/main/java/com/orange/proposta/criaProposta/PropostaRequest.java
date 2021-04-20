@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public class PropostaRequest {
-    private UUID id;
     @NotBlank
     private String documento;
     @Email
@@ -21,16 +20,11 @@ public class PropostaRequest {
     private BigDecimal salario;
 
     public PropostaRequest(Long id, @NotBlank String documento, @Email @NotBlank String email, @NotBlank String nome, @NotBlank String endereco, @NotNull @Positive BigDecimal salario) {
-        this.id = UUID.randomUUID();
         this.documento = documento.replace(".", "").replace("-","");
         this.email = email;
         this.nome = nome;
         this.endereco = endereco;
         this.salario = salario;
-    }
-    
-    public UUID getId() {
-        return id;
     }
 
     public String getDocumento() {
@@ -42,6 +36,6 @@ public class PropostaRequest {
     }
 
     public Proposta converter(){
-        return new Proposta(id,documento, email, nome, endereco, salario);
+        return new Proposta(documento, email, nome, endereco, salario);
     }
 }

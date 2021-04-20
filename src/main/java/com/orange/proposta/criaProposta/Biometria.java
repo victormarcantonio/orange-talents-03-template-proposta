@@ -1,9 +1,6 @@
 package com.orange.proposta.criaProposta;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -12,6 +9,8 @@ import java.util.UUID;
 public class Biometria {
 
     @Id
+    @GeneratedValue
+    @Column(columnDefinition = "BINARY(16)")
     private UUID id;
     @Lob
     private String fingerprint;

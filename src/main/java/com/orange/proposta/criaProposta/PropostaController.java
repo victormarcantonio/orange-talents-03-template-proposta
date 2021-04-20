@@ -48,29 +48,28 @@ public class PropostaController {
         Proposta proposta = request.converter();
         boolean existeDocumento = propostaRepository.existsByDocumento(request.getDocumento());
         if(existeDocumento) {
-          throw new ApiErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Já existe proposta criada para o cliente de documento "+request.getDocumento());
+            throw new ApiErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Já existe proposta criada para o cliente de documento "+request.getDocumento());
         }
-            resultadoAnalise(proposta);
-            URI uri = uriBuilder.path("/propostas/{id}").buildAndExpand(request.getId()).toUri();
-            return ResponseEntity.created(uri).body(request);
+        propostaRepository.save(proposta);
+        AnaliseResponse analiseResponse = analiseProposta(proposta);
+        proposta.aceitaProposta(analiseResponse.getResultadoSolicitacao());
+        propostaRepository.save(proposta);
+        URI uri = uriBuilder.path("/propostas/{id}").buildAndExpand(proposta.getId()).toUri();
+        return ResponseEntity.created(uri).body(request);
     }
 
     @GetMapping("/{idProposta}")
-    public ResponseEntity<PropostaResponse> detalheProposta(@PathVariable ("idProposta") UUID idProposta){
+    public ResponseEntity<PropostaResponse> detalheProposta(@PathVariable ("idProposta") Long idProposta){
        Optional<Proposta> possivelProposta = propostaRepository.findById(idProposta);
         return possivelProposta.map(proposta -> ResponseEntity.ok().body(new PropostaResponse(proposta)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    public void resultadoAnalise(Proposta proposta){
+    public AnaliseResponse analiseProposta(Proposta proposta){
         AnaliseRequest analiseRequest = new AnaliseRequest(proposta.getDocumento(), proposta.getNome(), proposta.getId().toString());
         try {
-            AnaliseResponse analiseResponse = propostaClient.analisaProposta(analiseRequest);
-            proposta.aceitaProposta(analiseResponse.getResultadoSolicitacao());
-            propostaRepository.save(proposta);
+            return  propostaClient.analisaProposta(analiseRequest);
         }catch(FeignException e){
-            proposta.aceitaProposta("COM_RESTRICAO");
-            propostaRepository.save(proposta);
             throw new FeignErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Proposta não elegível");
         }
     }

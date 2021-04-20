@@ -1,5 +1,7 @@
 package com.orange.proposta.criaProposta;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -13,6 +15,8 @@ import java.util.UUID;
 public class Proposta {
 
     @Id
+    @GeneratedValue
+    @Column(columnDefinition = "BINARY(16)")
     private UUID id;
     @NotBlank
     private String documento;
@@ -26,7 +30,7 @@ public class Proposta {
     @Positive
     private BigDecimal salario;
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.NAO_ELEGIVEL;
     @OneToOne(mappedBy = "proposta")
     private Cartao cartao;
 
@@ -35,8 +39,7 @@ public class Proposta {
     public Proposta() {
     }
 
-    public Proposta(UUID id, @NotBlank String documento, @NotBlank String email, @NotBlank String nome, @NotBlank String endereco, @NotBlank @Positive BigDecimal salario) {
-        this.id = id;
+    public Proposta(@NotBlank String documento, @NotBlank String email, @NotBlank String nome, @NotBlank String endereco, @NotBlank @Positive BigDecimal salario) {
         this.documento = documento;
         this.email = email;
         this.nome = nome;
@@ -73,8 +76,9 @@ public class Proposta {
     }
 
     public void aceitaProposta(String resultadoSolicitacao) {
-      this.status = resultadoSolicitacao.equals("SEM_RESTRICAO") ? Status.ELEGIVEL : Status.NAO_ELEGIVEL;
+        this.status = resultadoSolicitacao.equals("SEM_RESTRICAO") ? Status.ELEGIVEL : Status.NAO_ELEGIVEL;
     }
+
 
     public Cartao criaCartao(CartaoResponse cartaoResponse) {
        return new Cartao(Long.parseLong(cartaoResponse.getId().replace("-", "")), LocalDateTime.parse(cartaoResponse.getEmitidoEm()), this);

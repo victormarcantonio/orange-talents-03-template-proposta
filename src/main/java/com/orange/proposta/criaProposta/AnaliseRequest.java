@@ -28,4 +28,13 @@ public class AnaliseRequest {
     public String getIdProposta() {
         return idProposta;
     }
+
+    @Override
+    public String toString() {
+        return "AnaliseRequest{" +
+                "documento='" + documento + '\'' +
+                ", nome='" + nome + '\'' +
+                ", idProposta='" + idProposta + '\'' +
+                '}';
+    }
 }
