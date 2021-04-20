@@ -1,4 +1,3 @@
-/*
 package com.orange.proposta.security;
 
 import org.springframework.context.annotation.Configuration;
@@ -9,19 +8,27 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 
 @Configuration
-@Profile("prod")
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests(authorizeRequests ->
-                authorizeRequests
-                        .antMatchers(HttpMethod.GET, "/propostas/**").hasAuthority("escopo-proposta:read")
-                        .antMatchers(HttpMethod.POST, "/propostas/**").hasAuthority("escopo-proposta:write")
-                        .anyRequest().authenticated()
+                {
+                    try {
+                        authorizeRequests
+                                .antMatchers(HttpMethod.GET, "/propostas/**").hasAuthority("SCOPE_escopo-proposta")
+                                .antMatchers(HttpMethod.POST, "/propostas/**").hasAuthority("SCOPE_escopo-proposta")
+                                .antMatchers("/h2-console/**").permitAll()
+                                .anyRequest().authenticated()
+                                .and().headers().frameOptions().sameOrigin()
+                                .and().csrf().disable();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
         )
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
     }
 }
-*/
+

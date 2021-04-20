@@ -31,8 +31,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SYNC_LIMIT: 2
-    networks:
-      - production-network
+
 
   kafka:
     image: "confluentinc/cp-kafka:5.2.1"
@@ -47,8 +46,6 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-    networks:
-      - production-network
 
   postgres:
     image: 'postgres:alpine'
@@ -61,8 +58,6 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: keycloak
       POSTGRES_HOST: postgres
-    networks:
-      - production-network
 
   keycloak:
     image: jboss/keycloak
@@ -91,8 +86,7 @@ services:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: Pa55w0rd
       POSTGRES_PORT_5432_TCP_ADDR: 127.0.0.1
-    networks:
-      - production-network
+
 
   analise:
     image: 'zupacademy/analise-financeira'
@@ -144,8 +138,6 @@ services:
       - 9411:9411
     environment:
       COLLECTOR_ZIPKIN_HTTP_PORT: 9411
-    networks:
-      - production-network
 
   prometheus:
     image: prom/prometheus
@@ -175,8 +167,6 @@ services:
       VAULT_DEV_ROOT_TOKEN_ID: ee413645-dbe8-4848-afc6-6bb2768ada75
       VAULT_TOKEN: ee413645-dbe8-4848-afc6-6bb2768ada75
       VAULT_ADDR: http://127.0.0.1:8200
-    networks:
-      - production-network
 
 volumes:
   grafana-volume:
