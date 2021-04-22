@@ -13,22 +13,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
         http.authorizeRequests(authorizeRequests ->
-                {
-                    try {
-                        authorizeRequests
-                                .antMatchers(HttpMethod.GET, "/propostas/**").hasAuthority("SCOPE_escopo-proposta")
-                                .antMatchers(HttpMethod.POST, "/propostas/**").hasAuthority("SCOPE_escopo-proposta")
-                                .antMatchers("/h2-console/**").permitAll()
-                                .anyRequest().authenticated()
-                                .and().headers().frameOptions().sameOrigin()
-                                .and().csrf().disable();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+                authorizeRequests
+                        .antMatchers(HttpMethod.GET, "/propostas/**").hasAuthority("SCOPE_escopo-proposta")
+                        .antMatchers(HttpMethod.POST, "/propostas/**").hasAuthority("SCOPE_escopo-proposta")
+                        .antMatchers("/h2-console/**").permitAll()
+                        .anyRequest().authenticated()
+
         )
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
+                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+                .headers().frameOptions().sameOrigin()
+                .and().csrf().disable();
+
     }
 }
 

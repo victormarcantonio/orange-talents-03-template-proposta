@@ -59,7 +59,7 @@ public class PropostaController {
     }
 
     @GetMapping("/{idProposta}")
-    public ResponseEntity<PropostaResponse> detalheProposta(@PathVariable ("idProposta") Long idProposta){
+    public ResponseEntity<PropostaResponse> detalheProposta(@PathVariable ("idProposta") UUID idProposta){
        Optional<Proposta> possivelProposta = propostaRepository.findById(idProposta);
         return possivelProposta.map(proposta -> ResponseEntity.ok().body(new PropostaResponse(proposta)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
