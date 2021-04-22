@@ -22,7 +22,7 @@ services:
        SPRING_PROFILE: prod
        ANALISE_URL: http://analise:9999
        CARTAO_URL: http://contas:8888
-       KEYCLOAK_ISSUER_URI: http://keycloack:8080/auth/realms/proposta
+       KEYCLOAK_ISSUER_URI: http://localhost:18080/auth/realms/proposta
        KEYCLOAK_JWKS_URI: http://keycloak:8080/auth/realms/proposta/protocol/openid-connect/certs
     networks:
       - production-network
@@ -94,7 +94,7 @@ services:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: Pa55w0rd
       POSTGRES_PORT_5432_TCP_ADDR: 127.0.0.1
-      KEYCLOAK_FRONTEND_URL: http://keycloak:8080/auth
+      KEYCLOAK_FRONTEND_URL: http://localhost:18080/auth
     networks:
       - production-network
 

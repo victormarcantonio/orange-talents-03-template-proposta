@@ -1,4 +1,4 @@
-package com.orange.proposta.criaProposta;
+package com.orange.proposta.cartao;
 
 import java.time.LocalDateTime;
 

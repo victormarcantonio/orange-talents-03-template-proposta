@@ -1,4 +1,7 @@
-package com.orange.proposta.criaProposta;
+package com.orange.proposta.biometria;
+
+import com.orange.proposta.biometria.Biometria;
+import com.orange.proposta.cartao.Cartao;
 
 import javax.validation.constraints.NotBlank;
 import java.nio.charset.StandardCharsets;
@@ -7,20 +10,15 @@ import java.util.UUID;
 
 public class BiometriaRequest {
 
-    private UUID id;
+
     @NotBlank
     private String fingerprint;
 
-    public BiometriaRequest(UUID id, @NotBlank String fingerprint) {
-        this.id = UUID.randomUUID();
+    public void setFingerprint(String fingerprint) {
         this.fingerprint = Base64.getEncoder().encodeToString(fingerprint.getBytes(StandardCharsets.UTF_8));
     }
 
-    public UUID getId() {
-        return id;
-    }
-
     public Biometria converter(Cartao cartao){
-        return new Biometria(id,fingerprint, cartao);
+        return new Biometria(fingerprint, cartao);
     }
 }

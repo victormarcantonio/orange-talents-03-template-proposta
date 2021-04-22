@@ -1,4 +1,6 @@
-package com.orange.proposta.criaProposta;
+package com.orange.proposta.cartao;
+
+import com.orange.proposta.criaProposta.Proposta;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

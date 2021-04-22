@@ -1,15 +1,18 @@
 package com.orange.proposta.criaProposta;
 
-import org.hibernate.annotations.GenericGenerator;
+
+import com.orange.proposta.cartao.Cartao;
+import com.orange.proposta.cartao.CartaoResponse;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+
 
 @Entity
 public class Proposta {

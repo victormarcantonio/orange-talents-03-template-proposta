@@ -1,8 +1,9 @@
-package com.orange.proposta.criaProposta;
+package com.orange.proposta.biometria;
+
+import com.orange.proposta.cartao.Cartao;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -27,8 +28,7 @@ public class Biometria {
     public Biometria() {
     }
 
-    public Biometria(UUID id, String fingerprint, Cartao cartao) {
-        this.id = id;
+    public Biometria(String fingerprint, Cartao cartao) {
         this.fingerprint = fingerprint;
         this.cartao = cartao;
     }
