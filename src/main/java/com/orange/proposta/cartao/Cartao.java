@@ -1,6 +1,7 @@
 package com.orange.proposta.cartao;
 
 import com.orange.proposta.criaProposta.Proposta;
+import com.orange.proposta.criaProposta.Status;
 
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -15,6 +16,8 @@ public class Cartao {
     private LocalDateTime emissao;
     @OneToOne
     private Proposta proposta;
+    @Enumerated
+    private StatusCartao status = StatusCartao.ATIVO;
 
 
     //Apenas Hibernate utiliza
@@ -30,5 +33,9 @@ public class Cartao {
 
     public Long getId() {
         return id;
+    }
+
+    public void bloqueia(){
+        this.status = StatusCartao.BLOQUEADO;
     }
 }

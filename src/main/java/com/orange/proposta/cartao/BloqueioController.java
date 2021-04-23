@@ -1,5 +1,6 @@
 package com.orange.proposta.cartao;
 
+import com.orange.proposta.compartilhado.ApiErroException;
 import com.orange.proposta.compartilhado.FeignErroException;
 import feign.FeignException;
 import org.springframework.http.HttpStatus;
@@ -33,15 +34,21 @@ public class BloqueioController {
        Optional<Cartao> possivelCartao = cartaoRepository.findById(Long.parseLong(idCartao.replace("-", "")));
        if(possivelCartao.isPresent()){
            Cartao cartao = possivelCartao.get();
-               Bloqueio bloqueio = request.converter(httpRequest.getRemoteAddr(),userAgent,cartaoRepository,cartao);
+           Optional<Bloqueio> possivelBloqueio = bloqueioRepository.findByCartao(cartao);
+           if(possivelBloqueio.isEmpty()) {
+               Bloqueio bloqueio = request.converter(httpRequest.getRemoteAddr(), userAgent, cartaoRepository, cartao);
                try {
                    cartaoClient.bloqueiaCartao(idCartao, request);
-               }catch(FeignException e){
-                   throw new FeignErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Cartão já bloqueado");
+               } catch (FeignException e) {
+                   throw new FeignErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Ocorreu alguma falha no sistema de bloquear cartão");
                }
+               cartao.bloqueia();
+               cartaoRepository.save(cartao);
                bloqueioRepository.save(bloqueio);
-               URI uri= uriBuilder.path("/cartoes/bloqueio/{id}").buildAndExpand(cartao.getId()).toUri();
+               URI uri = uriBuilder.path("/cartoes/bloqueio/{id}").buildAndExpand(cartao.getId()).toUri();
                return ResponseEntity.created(uri).build();
+           }
+           throw new ApiErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Proposta já bloqueada");
        }
        return ResponseEntity.notFound().build();
     }
