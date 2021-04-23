@@ -22,8 +22,8 @@ public class BiometriaController {
     }
 
     @PostMapping("/biometria/{idCartao}")
-    public ResponseEntity<?> cadastrarBiometria(@PathVariable("idCartao") Long idCartao, @RequestBody BiometriaRequest request, UriComponentsBuilder uriBuilder){
-        Optional<Cartao> cartao = cartaoRepository.findById(idCartao);
+    public ResponseEntity<?> cadastrarBiometria(@PathVariable("idCartao") String idCartao, @RequestBody BiometriaRequest request, UriComponentsBuilder uriBuilder){
+        Optional<Cartao> cartao = cartaoRepository.findById(Long.parseLong(idCartao.replace("-","")));
         if(cartao.isPresent()){
             Biometria biometria = request.converter(cartao.get());
             biometriaRepository.save(biometria);

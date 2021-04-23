@@ -3,10 +3,10 @@ package com.orange.proposta.cartao;
 import com.orange.proposta.criaProposta.Proposta;
 
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 public class Cartao {
@@ -15,6 +15,7 @@ public class Cartao {
     private LocalDateTime emissao;
     @OneToOne
     private Proposta proposta;
+
 
     //Apenas Hibernate utiliza
     @Deprecated
@@ -25,5 +26,9 @@ public class Cartao {
         this.id = id;
         this.emissao = emissao;
         this.proposta = proposta;
+    }
+
+    public Long getId() {
+        return id;
     }
 }
