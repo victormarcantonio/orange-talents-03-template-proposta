@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 
 @Configuration
+@Profile("prod")
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 

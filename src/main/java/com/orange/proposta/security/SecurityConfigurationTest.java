@@ -1,4 +1,3 @@
-/*
 package com.orange.proposta.security;
 
 import org.springframework.context.annotation.Configuration;
@@ -15,4 +14,3 @@ public class SecurityConfigurationTest extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/**");
     }
 }
-*/

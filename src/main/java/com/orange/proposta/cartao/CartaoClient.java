@@ -12,5 +12,5 @@ public interface CartaoClient {
     Optional<CartaoResponse> retornaCartao(@RequestParam(value = "idProposta") String idProposta);
 
     @RequestMapping(method = RequestMethod.POST, value="/api/cartoes/{id}/bloqueios")
-    BloqueioResponse bloqueiaCartao(@PathVariable ("id") String id, @RequestBody BloqueioRequest bloqueioRequest);
+    void bloqueiaCartao(@PathVariable ("id") String id, @RequestBody BloqueioRequest bloqueioRequest);
 }

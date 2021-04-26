@@ -18,9 +18,9 @@ import java.util.Optional;
 @RequestMapping("/cartoes")
 public class BloqueioController {
 
-    CartaoRepository cartaoRepository;
-    BloqueioRepository bloqueioRepository;
-    CartaoClient cartaoClient;
+    private CartaoRepository cartaoRepository;
+    private BloqueioRepository bloqueioRepository;
+    private CartaoClient cartaoClient;
 
 
     public BloqueioController(CartaoRepository cartaoRepository, BloqueioRepository bloqueioRepository, CartaoClient cartaoClient) {
