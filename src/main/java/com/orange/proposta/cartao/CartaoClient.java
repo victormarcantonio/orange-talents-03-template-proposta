@@ -13,4 +13,7 @@ public interface CartaoClient {
 
     @RequestMapping(method = RequestMethod.POST, value="/api/cartoes/{id}/bloqueios")
     void bloqueiaCartao(@PathVariable ("id") String id, @RequestBody BloqueioRequest bloqueioRequest);
+
+    @RequestMapping(method = RequestMethod.POST, value = "/api/cartoes/{id}/avisos")
+    void avisaViagem(@PathVariable ("id") String id, @RequestBody AvisoViagemRequest avisoViagemRequest);
 }

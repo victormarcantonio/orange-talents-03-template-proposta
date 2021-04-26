@@ -63,6 +63,11 @@ public class CartaoController {
                                                   @RequestBody @Valid AvisoViagemRequest request, UriComponentsBuilder uriBuilder){
         Optional<Cartao> possivelCartao = cartaoRepository.findById(Long.parseLong(idCartao.replace("-","")));
         if(possivelCartao.isPresent()){
+            try{
+                cartaoClient.avisaViagem(idCartao, request);
+            }catch (FeignException e){
+                throw new FeignErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Aviso viagem não cadastrado");
+            }
             Cartao cartao = possivelCartao.get();
             AvisoViagem avisoViagem = request.converter(userAgent,httpServletRequest.getRemoteAddr(),cartaoRepository,cartao);
             avisoViagemRepository.save(avisoViagem);
@@ -72,5 +77,4 @@ public class CartaoController {
 
        return ResponseEntity.notFound().build();
     }
-
 }
