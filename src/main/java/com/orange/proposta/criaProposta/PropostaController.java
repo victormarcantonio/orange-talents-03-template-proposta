@@ -7,6 +7,7 @@ import com.orange.proposta.cartao.Cartao;
 import com.orange.proposta.cartao.CartaoClient;
 import com.orange.proposta.compartilhado.ApiErroException;
 import com.orange.proposta.compartilhado.FeignErroException;
+import com.orange.proposta.metrica.MinhasMetricas;
 import feign.FeignException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +28,12 @@ public class PropostaController {
     //1
     private PropostaClient propostaClient;
 
-    public PropostaController(PropostaRepository propostaRepository, PropostaClient propostaClient, CartaoClient cartaoClient) {
+    private MinhasMetricas minhasMetricas;
+
+    public PropostaController(PropostaRepository propostaRepository, PropostaClient propostaClient, MinhasMetricas minhasMetricas) {
         this.propostaRepository = propostaRepository;
         this.propostaClient = propostaClient;
+        this.minhasMetricas = minhasMetricas;
     }
 
     @PostMapping
@@ -44,6 +48,7 @@ public class PropostaController {
         AnaliseResponse analiseResponse = analiseProposta(proposta);
         proposta.aceitaProposta(analiseResponse.getResultadoSolicitacao());
         propostaRepository.save(proposta);
+        minhasMetricas.contador();
         URI uri = uriBuilder.path("/propostas/{id}").buildAndExpand(proposta.getId()).toUri();
         return ResponseEntity.created(uri).body(request);
     }
