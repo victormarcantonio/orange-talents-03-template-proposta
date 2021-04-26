@@ -24,6 +24,8 @@ services:
        CARTAO_URL: http://contas:8888
        KEYCLOAK_ISSUER_URI: http://localhost:18080/auth/realms/proposta
        KEYCLOAK_JWKS_URI: http://keycloak:8080/auth/realms/proposta/protocol/openid-connect/certs
+       NOME_DA_APLICACAO: proposta
+       AMBIENTE: prod
     networks:
       - production-network
 
