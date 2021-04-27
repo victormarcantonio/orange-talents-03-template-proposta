@@ -3,11 +3,10 @@ package com.orange.proposta.cartao;
 import com.orange.proposta.criaProposta.Proposta;
 import com.orange.proposta.criaProposta.Status;
 
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Cartao {
@@ -18,6 +17,10 @@ public class Cartao {
     private Proposta proposta;
     @Enumerated
     private StatusCartao status = StatusCartao.ATIVO;
+    @OneToOne(mappedBy = "cartao")
+    private Bloqueio bloqueio;
+    @OneToMany(mappedBy = "cartao", cascade = CascadeType.MERGE)
+    private Set<Carteira> carteiras = new HashSet<>();
 
 
     //Apenas Hibernate utiliza
@@ -37,5 +40,18 @@ public class Cartao {
 
     public void bloqueia(){
         this.status = StatusCartao.BLOQUEADO;
+    }
+
+    public boolean temBloqueio(){
+        return this.bloqueio != null;
+    }
+
+    public boolean possuiCarteiraPaypal(String tipo){
+       return this.carteiras.stream().anyMatch(carteira -> carteira.carteiraPaypal(Enum.valueOf(TipoCarteira.class,tipo)));
+    }
+
+    public void associaCarteira(CarteiraRequest request){
+       Carteira carteira = new Carteira(request.getEmail(), Enum.valueOf(TipoCarteira.class,request.getCarteira()), this);
+       this.carteiras.add(carteira);
     }
 }

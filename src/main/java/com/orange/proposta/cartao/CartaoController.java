@@ -10,6 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.net.URI;
 import java.util.Optional;
 
@@ -22,7 +23,6 @@ public class CartaoController {
     private CartaoClient cartaoClient;
     private AvisoViagemRepository avisoViagemRepository;
 
-
     public CartaoController(CartaoRepository cartaoRepository, BloqueioRepository bloqueioRepository, CartaoClient cartaoClient, AvisoViagemRepository avisoViagemRepository) {
         this.cartaoRepository = cartaoRepository;
         this.bloqueioRepository = bloqueioRepository;
@@ -32,14 +32,13 @@ public class CartaoController {
 
     @PostMapping("/bloqueio/{idCartao}")
     public ResponseEntity<?> bloqueia(@RequestHeader(value = "User-Agent") String userAgent, HttpServletRequest httpRequest,
-                                      @PathVariable ("idCartao") String idCartao, @RequestBody @Valid BloqueioRequest request,
+                                      @PathVariable ("idCartao")  @NotBlank String idCartao , @RequestBody @Valid BloqueioRequest request,
                                       UriComponentsBuilder uriBuilder){
        Optional<Cartao> possivelCartao = cartaoRepository.findById(Long.parseLong(idCartao.replace("-", "")));
        if(possivelCartao.isPresent()){
            Cartao cartao = possivelCartao.get();
-           Optional<Bloqueio> possivelBloqueio = bloqueioRepository.findByCartao(cartao);
-           if(possivelBloqueio.isEmpty()) {
-               Bloqueio bloqueio = request.converter(httpRequest.getRemoteAddr(), userAgent, cartaoRepository, cartao);
+           if(!cartao.temBloqueio()) {
+               Bloqueio bloqueio = request.converter(httpRequest.getRemoteAddr(), userAgent, cartao);
                try {
                    cartaoClient.bloqueiaCartao(idCartao, request);
                } catch (FeignException e) {
@@ -51,7 +50,7 @@ public class CartaoController {
                URI uri = uriBuilder.path("/cartoes/bloqueio/{id}").buildAndExpand(bloqueio.getId()).toUri();
                return ResponseEntity.created(uri).build();
            }
-           throw new ApiErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Proposta já bloqueada");
+           throw new ApiErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Cartão já bloqueado");
        }
        return ResponseEntity.notFound().build();
     }
@@ -59,7 +58,7 @@ public class CartaoController {
 
     @PostMapping("/aviso-viagem/{idCartao}")
     public ResponseEntity<?> cadastrarAvisoViagem(@RequestHeader(value = "User-Agent") String userAgent, HttpServletRequest httpServletRequest,
-                                                  @PathVariable ("idCartao") String idCartao,
+                                                  @PathVariable ("idCartao") @NotBlank String idCartao,
                                                   @RequestBody @Valid AvisoViagemRequest request, UriComponentsBuilder uriBuilder){
         Optional<Cartao> possivelCartao = cartaoRepository.findById(Long.parseLong(idCartao.replace("-","")));
         if(possivelCartao.isPresent()){
@@ -69,12 +68,27 @@ public class CartaoController {
                 throw new FeignErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Aviso viagem não cadastrado");
             }
             Cartao cartao = possivelCartao.get();
-            AvisoViagem avisoViagem = request.converter(userAgent,httpServletRequest.getRemoteAddr(),cartaoRepository,cartao);
+            AvisoViagem avisoViagem = request.converter(userAgent,httpServletRequest.getRemoteAddr(),cartao);
             avisoViagemRepository.save(avisoViagem);
             URI uri = uriBuilder.path("/cartoes/aviso-viagem/{id}").buildAndExpand(avisoViagem.getId()).toUri();
             return ResponseEntity.created(uri).build();
         }
 
        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/carteiras/{idCartao}")
+    public ResponseEntity<?> associaCarteira(@PathVariable ("idCartao") @NotBlank String idCartao, @RequestBody @Valid CarteiraRequest request){
+        Optional<Cartao> possivelCartao = cartaoRepository.findById(Long.parseLong(idCartao.replace("-","")));
+        if(possivelCartao.isPresent()){
+            Cartao cartao = possivelCartao.get();
+            if(!cartao.possuiCarteiraPaypal(request.getCarteira())) {
+                cartao.associaCarteira(request);
+                cartaoRepository.save(cartao);
+                return ResponseEntity.ok().build();
+            }
+            throw new ApiErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Cartão já associado ao paypal");
+        }
+        return ResponseEntity.notFound().build();
     }
 }

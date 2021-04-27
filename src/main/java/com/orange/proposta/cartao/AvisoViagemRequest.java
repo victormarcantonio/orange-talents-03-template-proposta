@@ -23,7 +23,7 @@ public class AvisoViagemRequest {
         return dataTermino;
     }
 
-    public AvisoViagem converter(String userAgent, String ip, CartaoRepository cartaoRepository, Cartao cartao){
+    public AvisoViagem converter(String userAgent, String ip, Cartao cartao){
         return new AvisoViagem(destino,dataTermino,ip,userAgent,cartao);
     }
 }
