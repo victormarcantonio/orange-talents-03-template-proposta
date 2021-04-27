@@ -58,21 +58,21 @@ public class CarteiraControllerTest {
 
     @DisplayName("Deve cadastrar a carteira")
     @Test
-    void teste04() throws Exception{
+    void teste01() throws Exception{
         propostaRepository.save(proposta);
         cartaoRepository.save(cartao);
         mockMvc.perform(MockMvcRequestBuilders.post("/cartoes/carteiras/" + cartao.getId())
                 .content(json(new CarteiraRequest("vitin@email.com", "PAYPAL")))
                 .header("User-Agent","Postman")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(200));
+                .andExpect(MockMvcResultMatchers.status().is(201));
     }
 
     @DisplayName("Deve lançar ApiErroException caso já tenha carteira paypal")
     @Test
-    void teste05() throws Exception{
+    void teste02() throws Exception{
         propostaRepository.save(proposta);
-        cartao.associaCarteira(new CarteiraRequest("vitin@email.com","PAYPAL"));
+        cartao.criaCarteira(new CarteiraRequest("vitin@email.com","PAYPAL"));
         cartaoRepository.save(cartao);
         mockMvc.perform(MockMvcRequestBuilders.post("/cartoes/carteiras/" + cartao.getId())
                 .content(json(new CarteiraRequest("vitin@email.com","PAYPAL")))

@@ -38,6 +38,10 @@ public class Cartao {
         return id;
     }
 
+    public Set<Carteira> getCarteiras() {
+        return carteiras;
+    }
+
     public void bloqueia(){
         this.status = StatusCartao.BLOQUEADO;
     }
@@ -50,8 +54,9 @@ public class Cartao {
        return this.carteiras.stream().anyMatch(carteira -> carteira.carteiraPaypal(Enum.valueOf(TipoCarteira.class,tipo)));
     }
 
-    public void associaCarteira(CarteiraRequest request){
+    public Carteira criaCarteira(CarteiraRequest request){
        Carteira carteira = new Carteira(request.getEmail(), Enum.valueOf(TipoCarteira.class,request.getCarteira()), this);
        this.carteiras.add(carteira);
+       return carteira;
     }
 }

@@ -33,7 +33,7 @@ import java.util.Optional;
 @AutoConfigureDataJpa
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @ExtendWith(MockitoExtension.class)
-public class CartaoControllerTest {
+public class BloqueioControllerTest {
 
 
     @Autowired
