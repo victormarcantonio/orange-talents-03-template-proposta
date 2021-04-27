@@ -15,7 +15,7 @@ import java.time.Month;
 import java.util.List;
 import java.util.Set;
 
-public class CarteiraPaypalTest {
+public class CarteiraTest {
 
     Proposta proposta = new Proposta("997.285.210-57","vitin@email.com","vitin","rua fidalga",new BigDecimal("2500.0"));
     Cartao cartao = new Cartao(2508532787248333L, LocalDateTime.of(2021, Month.APRIL,24,14,35,30,1),proposta);
@@ -23,7 +23,7 @@ public class CarteiraPaypalTest {
     @DisplayName("Deve retornar false caso o cartão não possua carteira PAYPAL vinculada")
     @Test
     void teste01(){
-        Assertions.assertFalse(cartao.possuiCarteiraPaypal("PAYPAL"));
+        Assertions.assertFalse(cartao.possuiCarteira("PAYPAL"));
     }
 
     @DisplayName("Deve retornar true caso o cartão possua a carteira PAYPAL vinculada")
@@ -34,6 +34,6 @@ public class CarteiraPaypalTest {
                 new Carteira("vitin@email.com", TipoCarteira.PAYPAL, cartao2)
         );
         ReflectionTestUtils.setField(cartao,"carteiras", carteiras);
-        Assertions.assertTrue(cartao.possuiCarteiraPaypal("PAYPAL"));
+        Assertions.assertTrue(cartao.possuiCarteira("PAYPAL"));
     }
 }

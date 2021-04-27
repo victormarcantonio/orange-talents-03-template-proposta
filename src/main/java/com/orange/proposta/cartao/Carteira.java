@@ -34,7 +34,7 @@ public class Carteira {
         return id;
     }
 
-    public boolean carteiraPaypal(TipoCarteira tipoCarteira){
+    public boolean retornaCarteira(TipoCarteira tipoCarteira){
         return this.carteira.equals(tipoCarteira);
     }
 

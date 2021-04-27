@@ -19,11 +19,12 @@ import java.util.Optional;
 public class CarteiraController {
 
     private CartaoRepository cartaoRepository;
+    private CarteiraRepository carteiraRepository;
     private CartaoClient cartaoClient;
 
-
-    public CarteiraController(CartaoRepository cartaoRepository, CartaoClient cartaoClient) {
+    public CarteiraController(CartaoRepository cartaoRepository, CarteiraRepository carteiraRepository, CartaoClient cartaoClient) {
         this.cartaoRepository = cartaoRepository;
+        this.carteiraRepository = carteiraRepository;
         this.cartaoClient = cartaoClient;
     }
 
@@ -32,18 +33,18 @@ public class CarteiraController {
         Optional<Cartao> possivelCartao = cartaoRepository.findById(Long.parseLong(idCartao.replace("-","")));
         if(possivelCartao.isPresent()){
             Cartao cartao = possivelCartao.get();
-            if(!cartao.possuiCarteiraPaypal(request.getCarteira())) {
+            if(!cartao.possuiCarteira(request.getCarteira())) {
                 try{
                     cartaoClient.associaCarteira(idCartao, request);
                 }catch (FeignException e){
                     throw new FeignErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Carteira não registrada");
                 }
-                Carteira carteira = cartao.criaCarteira(request);
-                cartaoRepository.save(cartao);
+                Carteira carteira = request.converter(cartao);
+                carteiraRepository.save(carteira);
                 URI uri = uriBuilder.path("/cartoes/carteiras/{id}").buildAndExpand(carteira.getId()).toUri();
                 return ResponseEntity.created(uri).build();
             }
-            throw new ApiErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Cartão já associado ao paypal");
+            throw new ApiErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Cartão já associado a carteira " + request.getCarteira());
         }
         return ResponseEntity.notFound().build();
     }

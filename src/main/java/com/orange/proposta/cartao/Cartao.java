@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 public class Cartao {
@@ -38,8 +39,8 @@ public class Cartao {
         return id;
     }
 
-    public Set<Carteira> getCarteiras() {
-        return carteiras;
+    public UUID getIdCarteira(Carteira carteira) {
+        return carteira.getId();
     }
 
     public void bloqueia(){
@@ -50,13 +51,8 @@ public class Cartao {
         return this.bloqueio != null;
     }
 
-    public boolean possuiCarteiraPaypal(String tipo){
-       return this.carteiras.stream().anyMatch(carteira -> carteira.carteiraPaypal(Enum.valueOf(TipoCarteira.class,tipo)));
+    public boolean possuiCarteira(String tipo){
+       return this.carteiras.stream().anyMatch(carteira -> carteira.retornaCarteira(Enum.valueOf(TipoCarteira.class,tipo)));
     }
 
-    public Carteira criaCarteira(CarteiraRequest request){
-       Carteira carteira = new Carteira(request.getEmail(), Enum.valueOf(TipoCarteira.class,request.getCarteira()), this);
-       this.carteiras.add(carteira);
-       return carteira;
-    }
 }

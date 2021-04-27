@@ -23,4 +23,8 @@ public class CarteiraRequest {
         return carteira;
     }
 
+
+    public Carteira converter(Cartao cartao){
+        return new Carteira(email, Enum.valueOf(TipoCarteira.class,carteira), cartao);
+    }
 }

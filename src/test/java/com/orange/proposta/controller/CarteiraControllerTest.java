@@ -43,10 +43,10 @@ public class CarteiraControllerTest {
     CartaoRepository cartaoRepository;
 
     @Autowired
-    BloqueioRepository bloqueioRepository;
+    PropostaRepository propostaRepository;
 
     @Autowired
-    PropostaRepository propostaRepository;
+    CarteiraRepository carteiraRepository;
 
 
     @MockBean
@@ -72,13 +72,25 @@ public class CarteiraControllerTest {
     @Test
     void teste02() throws Exception{
         propostaRepository.save(proposta);
-        cartao.criaCarteira(new CarteiraRequest("vitin@email.com","PAYPAL"));
         cartaoRepository.save(cartao);
+        carteiraRepository.save(carteira);
         mockMvc.perform(MockMvcRequestBuilders.post("/cartoes/carteiras/" + cartao.getId())
                 .content(json(new CarteiraRequest("vitin@email.com","PAYPAL")))
                 .header("User-Agent","Postman")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(mvcResult -> Assertions.assertTrue(mvcResult.getResolvedException() instanceof ApiErroException));
+    }
+
+    @DisplayName("Deve permitir cadastro na carteira Samsung Pay")
+    @Test
+    void teste03() throws Exception{
+        propostaRepository.save(proposta);
+        cartaoRepository.save(cartao);
+        mockMvc.perform(MockMvcRequestBuilders.post("/cartoes/carteiras/" + cartao.getId())
+                .content(json(new CarteiraRequest("vitin@email.com","SAMSUNG")))
+                .header("User-Agent","Postman")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is(201));
     }
 
 
