@@ -9,6 +9,8 @@ import com.orange.proposta.compartilhado.ApiErroException;
 import com.orange.proposta.compartilhado.FeignErroException;
 import com.orange.proposta.metrica.MinhasMetricas;
 import feign.FeignException;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +40,6 @@ public class PropostaController {
 
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody @Valid PropostaRequest request, UriComponentsBuilder uriBuilder) {
-
         Proposta proposta = request.converter();
         boolean existeDocumento = propostaRepository.existsByDocumento(request.getDocumento());
         if(existeDocumento) {

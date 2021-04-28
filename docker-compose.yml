@@ -16,6 +16,7 @@ services:
       - mysql
       - contas
       - analise
+      - jaeger
     ports:
       - '8081:8080'
     environment:
@@ -26,6 +27,10 @@ services:
        KEYCLOAK_JWKS_URI: http://keycloak:8080/auth/realms/proposta/protocol/openid-connect/certs
        NOME_DA_APLICACAO: proposta
        AMBIENTE: prod
+       SERVICE_NAME: api
+       JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+       JAEGER_ENABLED: "true"
+       JAEGER_SAMPLER: 1
     networks:
       - production-network
 

@@ -39,10 +39,6 @@ public class Cartao {
         return id;
     }
 
-    public UUID getIdCarteira(Carteira carteira) {
-        return carteira.getId();
-    }
-
     public void bloqueia(){
         this.status = StatusCartao.BLOQUEADO;
     }
