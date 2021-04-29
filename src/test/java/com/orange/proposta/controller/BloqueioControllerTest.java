@@ -19,10 +19,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -31,7 +33,7 @@ import java.util.Optional;
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureDataJpa
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Transactional
 @ExtendWith(MockitoExtension.class)
 public class BloqueioControllerTest {
 
@@ -87,10 +89,10 @@ public class BloqueioControllerTest {
 
     @DisplayName("Deve retornar Api Exception caso o cartão já esteja bloqueado")
     @Test
-    void teste03() throws Exception {
+    void teste03() throws Exception{
         propostaRepository.save(proposta);
         cartaoRepository.save(cartao);
-        bloqueioRepository.save(bloqueio);
+        ReflectionTestUtils.setField(cartao,"bloqueio",bloqueio);
         mockMvc.perform(MockMvcRequestBuilders.post("/cartoes/bloqueio/" + cartao.getId())
                 .content(json(new BloqueioRequest()))
                 .header("User-Agent","Postman")

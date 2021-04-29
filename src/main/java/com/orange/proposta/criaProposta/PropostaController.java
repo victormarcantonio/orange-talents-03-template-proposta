@@ -32,14 +32,20 @@ public class PropostaController {
 
     private MinhasMetricas minhasMetricas;
 
-    public PropostaController(PropostaRepository propostaRepository, PropostaClient propostaClient, MinhasMetricas minhasMetricas) {
+    private Tracer tracer;
+
+    public PropostaController(PropostaRepository propostaRepository, PropostaClient propostaClient, MinhasMetricas minhasMetricas, Tracer tracer) {
         this.propostaRepository = propostaRepository;
         this.propostaClient = propostaClient;
         this.minhasMetricas = minhasMetricas;
+        this.tracer = tracer;
     }
 
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody @Valid PropostaRequest request, UriComponentsBuilder uriBuilder) {
+        Span activeSpan = tracer.activeSpan();
+        activeSpan.setTag("user.email", request.getEmail());
+        activeSpan.log("teste");
         Proposta proposta = request.converter();
         boolean existeDocumento = propostaRepository.existsByDocumento(request.getDocumento());
         if(existeDocumento) {
