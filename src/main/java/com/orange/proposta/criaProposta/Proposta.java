@@ -86,44 +86,8 @@ public class Proposta {
        return new Cartao(Long.parseLong(cartaoResponse.getId().replace("-", "")), LocalDateTime.parse(cartaoResponse.getEmitidoEm()), this);
     }
 
-    public boolean verificaDocumento(String nrDocumento){
-        return this.documento.equals(nrDocumento);
-    }
-
     public void setDocumento(String documento) {
         this.documento = documento;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Proposta)) return false;
-
-        Proposta proposta = (Proposta) o;
-
-        if (getId() != null ? !getId().equals(proposta.getId()) : proposta.getId() != null) return false;
-        if (getDocumento() != null ? !getDocumento().equals(proposta.getDocumento()) : proposta.getDocumento() != null)
-            return false;
-        if (getEmail() != null ? !getEmail().equals(proposta.getEmail()) : proposta.getEmail() != null) return false;
-        if (getNome() != null ? !getNome().equals(proposta.getNome()) : proposta.getNome() != null) return false;
-        if (getEndereco() != null ? !getEndereco().equals(proposta.getEndereco()) : proposta.getEndereco() != null)
-            return false;
-        if (getSalario() != null ? !getSalario().equals(proposta.getSalario()) : proposta.getSalario() != null)
-            return false;
-        if (getStatus() != proposta.getStatus()) return false;
-        return cartao != null ? cartao.equals(proposta.cartao) : proposta.cartao == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = getId() != null ? getId().hashCode() : 0;
-        result = 31 * result + (getDocumento() != null ? getDocumento().hashCode() : 0);
-        result = 31 * result + (getEmail() != null ? getEmail().hashCode() : 0);
-        result = 31 * result + (getNome() != null ? getNome().hashCode() : 0);
-        result = 31 * result + (getEndereco() != null ? getEndereco().hashCode() : 0);
-        result = 31 * result + (getSalario() != null ? getSalario().hashCode() : 0);
-        result = 31 * result + (getStatus() != null ? getStatus().hashCode() : 0);
-        result = 31 * result + (cartao != null ? cartao.hashCode() : 0);
-        return result;
-    }
 }
