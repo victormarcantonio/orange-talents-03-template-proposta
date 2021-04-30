@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public class PropostaRequest {
     @NotBlank
+    @Documento
     private String documento;
     @Email
     @NotBlank
