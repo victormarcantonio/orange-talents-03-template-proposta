@@ -13,11 +13,13 @@ import io.opentracing.Span;
 import io.opentracing.Tracer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -46,14 +48,18 @@ public class PropostaController {
         Span activeSpan = tracer.activeSpan();
         activeSpan.setTag("user.email", request.getEmail());
         activeSpan.log("teste");
+        List<Proposta> propostas = propostaRepository.findAll();
+        propostas.forEach(proposta -> {
+            String docDecrypt = decrypt(proposta.getDocumento());
+            if(docDecrypt.equals(request.getDocumento())){
+                throw new ApiErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Proposta já cadastrada para este cliente");
+            }
+        });
         Proposta proposta = request.converter();
-        boolean existeDocumento = propostaRepository.existsByDocumento(request.getDocumento());
-        if(existeDocumento) {
-            throw new ApiErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Já existe proposta criada para o cliente de documento "+request.getDocumento());
-        }
         propostaRepository.save(proposta);
         AnaliseResponse analiseResponse = analiseProposta(proposta);
         proposta.aceitaProposta(analiseResponse.getResultadoSolicitacao());
+        proposta.setDocumento(encrypt(proposta.getDocumento()));
         propostaRepository.save(proposta);
         minhasMetricas.contador();
         URI uri = uriBuilder.path("/propostas/{id}").buildAndExpand(proposta.getId()).toUri();
@@ -74,6 +80,14 @@ public class PropostaController {
         }catch(FeignException e){
             throw new FeignErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Proposta não elegível");
         }
+    }
+
+    private String decrypt(String doc){
+       return  Encryptors.text("password", "70617373776f7264").decrypt(doc);
+    }
+
+    private String encrypt(String doc){
+        return  Encryptors.text("password", "70617373776f7264").encrypt(doc);
     }
 
 }

@@ -6,6 +6,7 @@ import com.orange.proposta.cartao.*;
 import com.orange.proposta.compartilhado.ApiErroException;
 import com.orange.proposta.criaProposta.Proposta;
 import com.orange.proposta.criaProposta.PropostaRepository;
+import org.aspectj.util.Reflection;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -23,8 +24,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -34,7 +35,6 @@ import java.util.Optional;
 @AutoConfigureMockMvc
 @AutoConfigureDataJpa
 @Transactional
-@ExtendWith(MockitoExtension.class)
 public class BloqueioControllerTest {
 
 
@@ -89,10 +89,10 @@ public class BloqueioControllerTest {
 
     @DisplayName("Deve retornar Api Exception caso o cartão já esteja bloqueado")
     @Test
-    void teste03() throws Exception{
-        propostaRepository.save(proposta);
-        cartaoRepository.save(cartao);
-        ReflectionTestUtils.setField(cartao,"bloqueio",bloqueio);
+    void teste03() throws Exception {
+        propostaRepository.saveAndFlush(proposta);
+        cartaoRepository.saveAndFlush(cartao);
+        bloqueioRepository.saveAndFlush(bloqueio);
         mockMvc.perform(MockMvcRequestBuilders.post("/cartoes/bloqueio/" + cartao.getId())
                 .content(json(new BloqueioRequest()))
                 .header("User-Agent","Postman")

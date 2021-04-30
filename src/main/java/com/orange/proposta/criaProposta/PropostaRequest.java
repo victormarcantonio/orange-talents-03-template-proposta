@@ -1,6 +1,8 @@
 package com.orange.proposta.criaProposta;
 
 
+import org.springframework.security.crypto.encrypt.Encryptors;
+
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -38,6 +40,7 @@ public class PropostaRequest {
     public String getEmail() {
         return email;
     }
+
 
     public Proposta converter(){
         return new Proposta(documento, email, nome, endereco, salario);
