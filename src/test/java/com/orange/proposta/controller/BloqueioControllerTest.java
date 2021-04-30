@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -35,6 +36,7 @@ import java.util.Optional;
 @AutoConfigureMockMvc
 @AutoConfigureDataJpa
 @Transactional
+@ActiveProfiles("test")
 public class BloqueioControllerTest {
 
 
@@ -46,9 +48,6 @@ public class BloqueioControllerTest {
 
     @Autowired
     CartaoRepository cartaoRepository;
-
-    @Autowired
-    BloqueioRepository bloqueioRepository;
 
     @Autowired
     PropostaRepository propostaRepository;
@@ -90,14 +89,14 @@ public class BloqueioControllerTest {
     @DisplayName("Deve retornar Api Exception caso o cartão já esteja bloqueado")
     @Test
     void teste03() throws Exception {
-        propostaRepository.saveAndFlush(proposta);
-        cartaoRepository.saveAndFlush(cartao);
-        bloqueioRepository.saveAndFlush(bloqueio);
+        propostaRepository.save(proposta);
+        cartao.bloqueia("123", "teste");
+        cartaoRepository.save(cartao);
         mockMvc.perform(MockMvcRequestBuilders.post("/cartoes/bloqueio/" + cartao.getId())
                 .content(json(new BloqueioRequest()))
                 .header("User-Agent","Postman")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(mvcResult -> Assertions.assertTrue(mvcResult.getResolvedException() instanceof ApiErroException));
+                .andExpect(MockMvcResultMatchers.status().is(422));
     }
     public String json(BloqueioRequest bloqueioRequest) throws JsonProcessingException {
         bloqueioRequest.setSistemaResponsavel("proposta");

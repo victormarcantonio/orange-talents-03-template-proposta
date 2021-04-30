@@ -18,7 +18,7 @@ public class Cartao {
     private Proposta proposta;
     @Enumerated
     private StatusCartao status = StatusCartao.ATIVO;
-    @OneToOne(mappedBy = "cartao")
+    @OneToOne(mappedBy = "cartao", cascade = CascadeType.ALL)
     private Bloqueio bloqueio;
     @OneToMany(mappedBy = "cartao", cascade = CascadeType.MERGE)
     private Set<Carteira> carteiras = new HashSet<>();
@@ -39,12 +39,17 @@ public class Cartao {
         return id;
     }
 
-    public void bloqueia(){
+    public void bloqueia(String ip, String userAgent){
         this.status = StatusCartao.BLOQUEADO;
+        this.bloqueio = new Bloqueio(ip, userAgent, this);
     }
 
     public boolean temBloqueio(){
         return this.bloqueio != null;
+    }
+
+    public UUID getBloqueio() {
+        return bloqueio.getId();
     }
 
     public boolean possuiCarteira(String tipo){

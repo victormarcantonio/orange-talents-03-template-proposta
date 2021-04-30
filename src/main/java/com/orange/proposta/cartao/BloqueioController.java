@@ -19,12 +19,10 @@ import java.util.Optional;
 public class BloqueioController {
 
     private CartaoRepository cartaoRepository;
-    private BloqueioRepository bloqueioRepository;
     private CartaoClient cartaoClient;
 
-    public BloqueioController(CartaoRepository cartaoRepository, BloqueioRepository bloqueioRepository, CartaoClient cartaoClient) {
+    public BloqueioController(CartaoRepository cartaoRepository, CartaoClient cartaoClient) {
         this.cartaoRepository = cartaoRepository;
-        this.bloqueioRepository = bloqueioRepository;
         this.cartaoClient = cartaoClient;
     }
 
@@ -36,16 +34,14 @@ public class BloqueioController {
         if(possivelCartao.isPresent()){
             Cartao cartao = possivelCartao.get();
             if(!cartao.temBloqueio()) {
-                Bloqueio bloqueio = request.converter(httpRequest.getRemoteAddr(), userAgent, cartao);
                 try {
                     cartaoClient.bloqueiaCartao(idCartao, request);
                 } catch (FeignException e) {
                     throw new FeignErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Ocorreu alguma falha no sistema de bloquear cartão");
                 }
-                cartao.bloqueia();
+                cartao.bloqueia(httpRequest.getRemoteAddr(), userAgent);
                 cartaoRepository.save(cartao);
-                bloqueioRepository.save(bloqueio);
-                URI uri = uriBuilder.path("/cartoes/bloqueio/{id}").buildAndExpand(bloqueio.getId()).toUri();
+                URI uri = uriBuilder.path("/cartoes/bloqueio/{id}").buildAndExpand(cartao.getBloqueio()).toUri();
                 return ResponseEntity.created(uri).build();
             }
             throw new ApiErroException(HttpStatus.UNPROCESSABLE_ENTITY, "Cartão já bloqueado");

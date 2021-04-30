@@ -15,7 +15,4 @@ public class BloqueioRequest {
         return sistemaResponsavel;
     }
 
-    public Bloqueio converter(String userAgent, String ip,  Cartao cartao){
-        return new Bloqueio(userAgent,ip, cartao);
-    }
 }

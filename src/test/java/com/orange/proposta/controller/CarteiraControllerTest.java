@@ -6,6 +6,7 @@ import com.orange.proposta.cartao.*;
 import com.orange.proposta.compartilhado.ApiErroException;
 import com.orange.proposta.criaProposta.Proposta;
 import com.orange.proposta.criaProposta.PropostaRepository;
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,18 +19,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.Set;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureDataJpa
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Transactional
 @ExtendWith(MockitoExtension.class)
 public class CarteiraControllerTest {
 
@@ -54,7 +58,7 @@ public class CarteiraControllerTest {
 
     Proposta proposta = new Proposta("997.285.210-57","vitin@email.com","vitin","rua fidalga",new BigDecimal("2500.0"));
     Cartao cartao = new Cartao(2508532787248333L, LocalDateTime.of(2021, Month.APRIL,24,14,35,30,1),proposta);
-    Carteira carteira = new Carteira("vitin@email.com", TipoCarteira.PAYPAL, cartao);
+
 
     @DisplayName("Deve cadastrar a carteira")
     @Test
@@ -71,14 +75,18 @@ public class CarteiraControllerTest {
     @DisplayName("Deve lançar ApiErroException caso já tenha carteira paypal")
     @Test
     void teste02() throws Exception{
+        CarteiraRequest carteiraRequest = new CarteiraRequest("vitin@email.com","PAYPAL");
         propostaRepository.save(proposta);
+        Set<Carteira>carteiras = Set.of(
+                new Carteira("vitin@email.com", TipoCarteira.PAYPAL, cartao)
+        );
+        ReflectionTestUtils.setField(cartao,"carteiras",carteiras);
         cartaoRepository.save(cartao);
-        carteiraRepository.save(carteira);
         mockMvc.perform(MockMvcRequestBuilders.post("/cartoes/carteiras/" + cartao.getId())
-                .content(json(new CarteiraRequest("vitin@email.com","PAYPAL")))
+                .content(json(carteiraRequest))
                 .header("User-Agent","Postman")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(mvcResult -> Assertions.assertTrue(mvcResult.getResolvedException() instanceof ApiErroException));
+                .andExpect(MockMvcResultMatchers.status().is(422));
     }
 
     @DisplayName("Deve permitir cadastro na carteira Samsung Pay")
